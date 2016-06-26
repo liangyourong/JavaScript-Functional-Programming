@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html >
+
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>2.一等函数与Applicative编程</title>
+
+</head>
+
+<body>
+
+<script type="text/javascript" src="underscore.js"></script>
+<script type="text/javascript">
+  	var nums=[1,2,3,4,5];
+    function doubleAll(array){
+      return _.map(array,function(n){return n*2});
+    }
+    console.log(doubleAll(nums));
+    function averager(array){
+      var sum= _.reduce(array,function(a,b){return a+b});
+      return sum/_.size(array);
+    }
+    console.log(averager(nums));
+    function onlyEven(array){
+      return _.filter(array,function(n){return n%2===0});
+    }
+    console.log( onlyEven(nums) )
+
+
+    console.log( _.find(['a','b',3,'d'],_.isNumber) );
+    console.log( _.reject(['a','b',3,'d'],_.isNumber) );
+    function complement(pred){
+      return function(){
+        return !pred.apply(null,_.toArray(arguments));
+      };
+    }
+    console.log(  _.filter(['a','b',3,'d'],complement(_.isNumber)) );
+
+    console.log(  _.all([1,2,3,4],_.isNumber) );
+    console.log(  _.any([1,2,'c',4],_.isString) );
+
+    var people=[{name:'Rick',age:30},{name:'Jaka',age:24}];
+    console.log( _.sortBy(people,function(p){return p.age;}) );
+
+    var albums=[{title:'Sabbath Bloody Sabbath',genre:'Metal'},
+                {title:'Scientist',genre:'Dub'},
+                {title:'Undertow',genre:'Metal'}
+              ];
+    console.log( _.groupBy(albums,function(a){return a.genre}) );
+    console.log( _.countBy(albums,function(a){return a.genre}) );
+
+
+    function existy(x){
+      return x!=null;
+    }
+    function cat(){
+      var head=_.first(arguments);
+      if(existy(head))
+        return head.concat.apply(head,_.rest(arguments));
+      else
+        return [];
+    }
+    console.log( cat([1,2,3],[4,5],[6,7,8]) );
+
+    function construct(head,tail){
+      return cat([head],_.toArray(tail));
+    }
+    console.log(  construct(42,[1,2,3]) )
+</script>
+</body>
+</html>

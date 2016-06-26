@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html >
+
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>1.JavaScript函数式编程简介</title>
+
+</head>
+
+<body>
+
+<script type="text/javascript" src="underscore.js"></script>
+<script type="text/javascript">
+  	/*1.2.5数据抽象*/
+    function lameCSV(str){
+      return _.reduce(str.split('\n'),function(table,row){
+        table.push(_.map(row.split(','),function(c){return c.trim();}));
+        return table;
+      },[]);
+    }
+    var peopleTable=lameCSV("name,age,hair\nMerble,35,red\nBob,64,blonde");
+    console.log(peopleTable);
+
+    function isIndexed(data){
+      return _.isArray(data) || _.isString(data);
+    }
+    function nth(a,index){
+      if(!_.isNumber(index))fail("Expecting a number as the index");
+      if(!isIndexed(a))fail("Not supported on non-indexed type");
+      if((index<0)||(index>a.length-1))
+        fail("Index value is out of bound");
+      return a[index];
+    }
+
+    function selectNames(table){
+      return _.rest(_.map(table,_.first));
+    }
+    function selectAges(table){
+      return _.rest(_.map(table,function(row){return nth(row,1)}))
+    }
+     function selectHair(table){
+      return _.rest(_.map(table,function(row){return nth(row,2)}))
+    }
+    console.log(selectNames(peopleTable));
+    console.log(selectAges(peopleTable));
+    console.log(selectHair(peopleTable));
+    console.log(_.zip(selectNames(peopleTable),selectAges(peopleTable)))
+
+    /*1.2.5JavaScript初试*/
+    function doWhen(cond,action){
+      if(truthy(cond))
+        return action();
+      else
+        return undefined;
+    }
+</script>
+</body>
+</html>

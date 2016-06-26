@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html >
+
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>2.一等函数与Applicative编程</title>
+
+</head>
+
+<body>
+
+<script type="text/javascript" src="underscore.js"></script>
+<script type="text/javascript">
+  	var zombie={name:'Bub',film:'Day of the Dead'};
+    console.log( _.keys(zombie) );
+    console.log( _.values(zombie) );
+
+    var books=[{title:'Chthon',author:'Anthony'},
+              {title:'Grendel',author:'Gardner'},
+              {title:'After Dark'},
+            ];
+    console.log(_.pluck(books,'author'));
+
+    console.log( _.pairs(zombie) );
+    console.log( 
+        _.object(_.map(_.pairs(zombie),function(pair){return [pair[0].toUpperCase(),pair[1]];}))
+     );
+
+    console.log( 
+        _.pluck(_.map(books,function(obj){return _.defaults(obj,{author:'Unknown'})}) , 'author')
+     );
+
+
+    var person={name:'Romy',token:'j3983ij',password:'tigress'};
+    var info=_.omit(person,'token','password');
+    console.log(info);
+    var creds=_.pick(person,'token','password');
+    console.log(creds);
+
+
+    var library=[
+      {title:'SICP',isbn:'0262010771',ed:1},
+      {title:'SICP',isbn:'0265010871',ed:2},
+      {title:'Joy of Clojure',isbn:'1935659547',ed:1}
+    ];
+    console.log( _.findWhere(library,{title:'SICP',ed:2}) );
+    console.log( _.where(library,{title:'SICP'}) );
+
+
+    //相当于SQL语句的select语句select title from library
+    function existy(x){
+      return x!=null;
+    }
+    function cat(){
+      var head=_.first(arguments);
+      if(existy(head))
+        return head.concat.apply(head,_.rest(arguments));
+      else
+        return [];
+    }
+    function construct(head,tail){
+      return cat([head],_.toArray(tail));
+    }
+    function project(table,keys){
+      return _.map(table,function(obj){
+        return _.pick.apply(null,construct(obj,keys));
+      });
+    }
+    var editionResults=project(library,['title','isbn']);
+    console.log(editionResults);
+    var isbnResults=project(editionResults,['isbn']);
+    console.log(isbnResults);
+
+    //相当于SQL语句的select语句SELECT ed AS edition FROM library
+    function rename(obj,newNames){
+      return _.reduce(newNames,function(o,nu,old){
+        if(_.has(obj,old)){
+          o[nu]=obj[old];
+          return o;
+        }
+        else
+          return o;
+      },
+        _.omit.apply(null,construct(obj,_.keys(newNames))));
+    }
+
+    console.log( rename({a:1,b:2},{'a':'AAA'}) );
+
+    function as(table,newNames){
+      return _.map(table,function(obj){
+        return rename(obj,newNames);
+      })
+    }
+
+    console.log(as(library,{ed:'edition'}));
+
+    //相当于SQL语句的select语句where
+    function existy(x){
+      return x!=null;
+    }
+    function truthy(x){
+      return (x!==false)&&existy(x);
+    }
+    function restrict(table,pred){
+      return _.reduce(table,function(newTable,obj){
+        if(truthy(pred(obj)))
+          return newTable;
+        else
+          return _.without(newTable,obj);
+      },table);
+    }
+    console.log( restrict(library,function(book){return book.ed>1;}) );
+
+    
+
+</script>
+</body>
+</html>
