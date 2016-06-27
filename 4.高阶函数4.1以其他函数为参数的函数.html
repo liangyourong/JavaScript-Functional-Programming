@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html >
+
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>4.高阶函数</title>
+
+</head>
+
+<body>
+
+<script type="text/javascript" src="underscore.js"></script>
+<script type="text/javascript">
+    /*max ,finder,best*/
+    var people=[{name:'Fred',age:65},{name:'Lucy',age:36}];
+  	console.log( _.max([1,2,3,4,5,6]) );
+    console.log( _.max(people,function(p){return p.age}) );
+
+    function plucker(FIELD){
+      return function(obj){
+        return obj&&obj[FIELD];
+      }
+    }
+    function finder(valueFun,bestFun,coll){
+      return _.reduce(coll,function(best,current){
+        var bestValue=valueFun(best);
+        var currentValue=valueFun(current);
+        return (bestValue === bestFun(bestValue,currentValue))?best:current;
+      });
+    }
+    console.log(finder(_.identity,Math.max,[1,2,3,4,5]));
+    console.log( finder(plucker('age'),Math.max,people) );
+
+
+    function best(fun,coll){
+      return _.reduce(coll,function(x,y){
+        return fun(x,y)?x:y;
+      });
+    }
+    console.log( best(function(x,y){return x>y},[1,2,3,4,5]) );
+
+
+    /*iterateUntil*/
+    function repeatedly(times,fun){
+      return _.map(_.range(times),fun);
+    }
+    console.log( repeatedly(3,function(){return Math.floor((Math.random()*10)+1);}) );
+
+    function iterateUntil(fun,check,init){
+      var ret=[];
+      var result=fun(init);
+
+      while(check(result)){
+        ret.push(result);
+        result=fun(result);
+      }
+      return ret;
+    }
+
+    console.log( iterateUntil(function(n){return n+n},function(n){return n<=1024},1) );
+
+</script>
+</body>
+</html>

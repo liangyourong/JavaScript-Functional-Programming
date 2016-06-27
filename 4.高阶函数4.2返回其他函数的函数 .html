@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html >
+
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>4.高阶函数</title>
+
+</head>
+
+<body>
+
+<script type="text/javascript" src="underscore.js"></script>
+<script type="text/javascript">
+    function always(VALUE){
+      return function(){
+        return VALUE;
+      }
+    }
+
+    /*1.闭包会捕获一个值，并多次返回相同的值*/
+    var f=always(function(){});
+    console.log( f()===f() );
+
+    /*2.每一个新的闭包都会捕获不一样的值*/
+    var g=always(function(){});
+    console.log( g()===f() );
+
+    function doWhen(cond,action){
+      if(truthy(cond))
+        return action();
+      else
+        return undefined;
+    }
+    function existy(x){
+      return x!=null;
+    }
+    function truthy(x){
+      return (x!==false)&&existy(x);
+    }
+    function fail(thing){
+      throw new Error(thing);
+    }
+    function inveker(NAME,METHOD){
+      return function(target){
+        if(!existy(target))fail('Must provide a target');
+        var targetMethod=target[NAME];
+        var args=_.rest(arguments);
+
+        return doWhen((existy(targetMethod)&&METHOD===targetMethod),function(){return targetMethod.apply(target,args)});
+      };
+    }
+    var rev=inveker('reverse',Array.prototype.reverse);
+    console.log( _.map([[1,2,3]],rev) )
+
+    function makeUniqueStringFunction(start){
+      var COUNTER=start;
+
+      return function(prefix){
+        return [prefix,COUNTER++].join(' ');
+      }
+    }
+    var uniqueString=makeUniqueStringFunction(0);
+    console.log( uniqueString('dari') )
+    console.log( uniqueString('dai') )
+
+    /*防止不存在的函数*/
+    function fnull(fun /*,default*/){
+      var defaults=_.rest(arguments);
+
+      return function(/*args*/){
+        var args=_.map(arguments,function(e,i){
+          return existy(e)?e:defaults[i];
+        });
+
+        return fun.apply(null,args);
+      };
+    }
+    var nums=[1,2,3,null,5];
+    var safeMult=fnull(function(total,n){return total*n},1,1);
+    console.log( _.reduce(nums,safeMult) );
+
+
+    function defaults(d){
+      return function(o,k){
+        var val=fnull(_.identity,d[k]);
+        return o&&val(o[k]);
+      };
+    }
+
+    function doSomething(config){
+      var lookup=defaults({critical:108});
+      return lookup(config,'critical');
+    }
+    console.log(  doSomething({critical:9}) )
+    console.log(  doSomething({}) )
+</script>
+</body>
+</html>
